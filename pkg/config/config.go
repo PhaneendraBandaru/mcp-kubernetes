@@ -1,10 +1,13 @@
 package config
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/Azure/mcp-kubernetes/pkg/security"
+	"github.com/Azure/mcp-kubernetes/pkg/telemetry"
 	flag "github.com/spf13/pflag"
 )
 
@@ -23,6 +26,12 @@ type ConfigData struct {
 	Port            int
 	AccessLevel     string
 	AllowNamespaces string
+
+	// OTLP endpoint for OpenTelemetry traces
+	OTLPEndpoint string
+
+	// Telemetry service
+	TelemetryService telemetry.TelemetryInterface
 }
 
 // NewConfig creates and returns a new configuration instance
@@ -55,6 +64,9 @@ func (cfg *ConfigData) ParseFlags() error {
 	flag.StringVar(&cfg.AllowNamespaces, "allow-namespaces", "",
 		"Comma-separated list of namespaces to allow (empty means all allowed)")
 
+	// OTLP settings
+	flag.StringVar(&cfg.OTLPEndpoint, "otlp-endpoint", "", "OTLP endpoint for OpenTelemetry traces (e.g. localhost:4317, default \"\")")
+
 	flag.Parse()
 
 	// Update security config with access level
@@ -85,6 +97,27 @@ func (cfg *ConfigData) ParseFlags() error {
 	}
 
 	return nil
+}
+
+// InitializeTelemetry initializes the telemetry service
+func (cfg *ConfigData) InitializeTelemetry(ctx context.Context, serviceName, serviceVersion string) {
+	// Create telemetry configuration
+	telemetryConfig := telemetry.NewConfig(serviceName, serviceVersion)
+
+	// Override OTLP endpoint from CLI if provided
+	if cfg.OTLPEndpoint != "" {
+		telemetryConfig.SetOTLPEndpoint(cfg.OTLPEndpoint)
+	}
+
+	// Initialize telemetry service
+	cfg.TelemetryService = telemetry.NewService(telemetryConfig)
+	if err := cfg.TelemetryService.Initialize(ctx); err != nil {
+		log.Printf("Failed to initialize telemetry: %v", err)
+		// Continue without telemetry - this is not a fatal error
+	}
+
+	// Track MCP server startup
+	cfg.TelemetryService.TrackServiceStartup(ctx)
 }
 
 var availableTools = []string{"kubectl", "helm", "cilium", "hubble"}
