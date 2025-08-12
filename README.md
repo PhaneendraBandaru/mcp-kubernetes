@@ -98,6 +98,7 @@ Usage of ./mcp-kubernetes:
       --additional-tools string   Comma-separated list of additional tools to support (kubectl is always enabled). Available: helm,cilium,hubble
       --allow-namespaces string   Comma-separated list of namespaces to allow (empty means all allowed)
       --host string               Host to listen for the server (only used with transport sse or streamable-http) (default "127.0.0.1")
+      --otlp-endpoint string      OTLP endpoint for OpenTelemetry traces (e.g. localhost:4317, default "")
       --port int                  Port to listen for the server (only used with transport sse or streamable-http) (default 8000)
       --timeout int               Timeout for command execution in seconds, default is 60s (default 60)
       --transport string          Transport mechanism to use (stdio, sse or streamable-http) (default "stdio")
@@ -418,6 +419,27 @@ command: "list nodes"
 ```
 
 </details>
+
+## Telemetry
+
+Telemetry collection is on by default.
+
+To opt out, set the environment variable `KUBERNETES_MCP_COLLECT_TELEMETRY=false`.
+
+### OpenTelemetry Support
+
+The mcp-kubernetes server supports exporting telemetry data using OpenTelemetry Protocol (OTLP). You can configure an OTLP endpoint to send traces to any OpenTelemetry-compatible backend:
+
+```json
+{
+  "mcpServers": {
+    "kubernetes": {
+      "command": "mcp-kubernetes",
+      "args": ["--otlp-endpoint", "localhost:4317"]
+    }
+  }
+}
+```
 
 ## Development
 
