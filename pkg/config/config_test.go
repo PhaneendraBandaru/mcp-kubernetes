@@ -80,7 +80,7 @@ func TestInitializeTelemetry(t *testing.T) {
 
 			// Clean up
 			if cfg.TelemetryService != nil {
-				cfg.TelemetryService.Shutdown(ctx)
+				_ = cfg.TelemetryService.Shutdown(ctx)
 			}
 		})
 	}
@@ -88,10 +88,6 @@ func TestInitializeTelemetry(t *testing.T) {
 
 func TestNewConfig(t *testing.T) {
 	cfg := NewConfig()
-
-	if cfg == nil {
-		t.Fatal("Expected config to be created")
-	}
 
 	// Test default values
 	if cfg.Transport != "stdio" {

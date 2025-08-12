@@ -53,11 +53,11 @@ func TestNewConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Set environment variables
 			for k, v := range tt.envVars {
-				os.Setenv(k, v)
+				_ = os.Setenv(k, v)
 			}
 			defer func() {
 				for k := range tt.envVars {
-					os.Unsetenv(k)
+					_ = os.Unsetenv(k)
 				}
 			}()
 
@@ -165,8 +165,8 @@ func TestGenerateDeviceID(t *testing.T) {
 func TestGetApplicationInsightsInstrumentationKey(t *testing.T) {
 	// Test with custom key
 	customKey := "custom-instrumentation-key"
-	os.Setenv("APPLICATIONINSIGHTS_INSTRUMENTATION_KEY", customKey)
-	defer os.Unsetenv("APPLICATIONINSIGHTS_INSTRUMENTATION_KEY")
+	_ = os.Setenv("APPLICATIONINSIGHTS_INSTRUMENTATION_KEY", customKey)
+	defer func() { _ = os.Unsetenv("APPLICATIONINSIGHTS_INSTRUMENTATION_KEY") }()
 
 	key := getApplicationInsightsInstrumentationKey()
 	if key != customKey {
@@ -174,7 +174,7 @@ func TestGetApplicationInsightsInstrumentationKey(t *testing.T) {
 	}
 
 	// Test with default key
-	os.Unsetenv("APPLICATIONINSIGHTS_INSTRUMENTATION_KEY")
+	_ = os.Unsetenv("APPLICATIONINSIGHTS_INSTRUMENTATION_KEY")
 	key = getApplicationInsightsInstrumentationKey()
 	if key != defaultInstrumentationKey {
 		t.Errorf("Expected default key %s, got %s", defaultInstrumentationKey, key)

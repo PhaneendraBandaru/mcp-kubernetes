@@ -14,9 +14,6 @@ func TestNewService(t *testing.T) {
 
 	service := NewService(config)
 
-	if service == nil {
-		t.Fatal("Expected service to be created")
-	}
 	if service.config != config {
 		t.Error("Expected service config to match input config")
 	}

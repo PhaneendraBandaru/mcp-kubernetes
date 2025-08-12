@@ -79,11 +79,7 @@ func TestCreateToolHandlerSuccess(t *testing.T) {
 		t.Errorf("Expected no error, got %v", err)
 	}
 
-	if result == nil {
-		t.Fatal("Expected result to be non-nil")
-	}
-
-	if result.Content == nil || len(result.Content) == 0 {
+	if len(result.Content) == 0 {
 		t.Fatal("Expected result content to be non-empty")
 	}
 
@@ -213,12 +209,8 @@ func TestCreateToolHandlerInvalidArguments(t *testing.T) {
 		t.Errorf("Expected no error from handler, got %v", err)
 	}
 
-	if result == nil {
-		t.Fatal("Expected result to be non-nil")
-	}
-
 	// Should contain error in result - check the actual error structure
-	if result.Content == nil || len(result.Content) == 0 {
+	if len(result.Content) == 0 {
 		t.Error("Expected result to contain error content")
 	}
 
