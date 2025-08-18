@@ -8,7 +8,7 @@ import (
 // Version information
 var (
 	// GitVersion is the git tag version
-	GitVersion = "1"
+	GitVersion = "dev"
 	// BuildMetadata is extra build time data
 	BuildMetadata = ""
 	// GitCommit is the git sha1
@@ -46,4 +46,13 @@ func GetVersionInfo() map[string]string {
 		"goVersion":    runtime.Version(),
 		"platform":     fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 	}
+}
+
+// PrintVersion prints version information in a human-readable format
+func PrintVersion() {
+	fmt.Printf("mcp-kubernetes version %s\n", GetVersion())
+	fmt.Printf("Git commit: %s\n", GitCommit)
+	fmt.Printf("Git tree state: %s\n", GitTreeState)
+	fmt.Printf("Go version: %s\n", runtime.Version())
+	fmt.Printf("Platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
 }
