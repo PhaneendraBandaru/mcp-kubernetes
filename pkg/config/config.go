@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/Azure/mcp-kubernetes/pkg/security"
 	"github.com/Azure/mcp-kubernetes/pkg/telemetry"
+	"github.com/Azure/mcp-kubernetes/pkg/version"
 	flag "github.com/spf13/pflag"
 )
 
@@ -67,7 +69,16 @@ func (cfg *ConfigData) ParseFlags() error {
 	// OTLP settings
 	flag.StringVar(&cfg.OTLPEndpoint, "otlp-endpoint", "", "OTLP endpoint for OpenTelemetry traces (e.g. localhost:4317, default \"\")")
 
+	// Version flag
+	showVersion := flag.Bool("version", false, "Show version information and exit")
+
 	flag.Parse()
+
+	// Handle version flag
+	if *showVersion {
+		version.PrintVersion()
+		os.Exit(0)
+	}
 
 	// Update security config with access level
 	switch cfg.AccessLevel {
