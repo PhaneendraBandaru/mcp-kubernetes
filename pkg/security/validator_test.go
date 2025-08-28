@@ -33,6 +33,19 @@ func TestValidatorAccessLevels(t *testing.T) {
 		{"Admin - create deployment", AccessLevelAdmin, "kubectl create deployment nginx --image=nginx", false, ""},
 		{"Admin - cordon node", AccessLevelAdmin, "kubectl cordon node1", false, ""},
 		{"Admin - drain node", AccessLevelAdmin, "kubectl drain node1", false, ""},
+
+		// Config operations tests
+		{"ReadOnly - config current-context", AccessLevelReadOnly, "config current-context", false, ""},
+		{"ReadOnly - config get-contexts", AccessLevelReadOnly, "config get-contexts", false, ""},
+		{"ReadOnly - config use-context", AccessLevelReadOnly, "config use-context mycontext", true, "config write operations in read-only mode"},
+
+		{"ReadWrite - config current-context", AccessLevelReadWrite, "config current-context", false, ""},
+		{"ReadWrite - config get-contexts", AccessLevelReadWrite, "config get-contexts", false, ""},
+		{"ReadWrite - config use-context", AccessLevelReadWrite, "config use-context mycontext", false, ""},
+
+		{"Admin - config current-context", AccessLevelAdmin, "config current-context", false, ""},
+		{"Admin - config get-contexts", AccessLevelAdmin, "config get-contexts", false, ""},
+		{"Admin - config use-context", AccessLevelAdmin, "config use-context mycontext", false, ""},
 	}
 
 	for _, tc := range tests {

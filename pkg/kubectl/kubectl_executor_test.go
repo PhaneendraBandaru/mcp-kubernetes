@@ -127,6 +127,44 @@ func TestKubectlToolExecutor_ValidateCombination(t *testing.T) {
 			resource:  "approve",
 			wantErr:   false,
 		},
+		// Config operations tests
+		{
+			name:      "valid config current-context",
+			toolName:  "kubectl_config",
+			operation: "config",
+			resource:  "current-context",
+			wantErr:   false,
+		},
+		{
+			name:      "valid config get-contexts",
+			toolName:  "kubectl_config",
+			operation: "config",
+			resource:  "get-contexts",
+			wantErr:   false,
+		},
+		{
+			name:      "valid config use-context",
+			toolName:  "kubectl_config",
+			operation: "config",
+			resource:  "use-context",
+			wantErr:   false,
+		},
+		{
+			name:      "invalid config resource",
+			toolName:  "kubectl_config",
+			operation: "config",
+			resource:  "invalid-resource",
+			wantErr:   true,
+			errMsg:    "invalid config subcommand 'invalid-resource'",
+		},
+		{
+			name:      "invalid config operation",
+			toolName:  "kubectl_config",
+			operation: "invalid-operation",
+			resource:  "",
+			wantErr:   true,
+			errMsg:    "invalid operation 'invalid-operation' for config tool",
+		},
 		// Unknown tool test
 		{
 			name:      "unknown tool",

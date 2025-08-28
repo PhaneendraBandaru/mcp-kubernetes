@@ -202,8 +202,20 @@ func (e *KubectlToolExecutor) validateConfigOperation(operation, resource string
 		}
 		return fmt.Errorf("invalid certificate subcommand '%s'. Valid subcommands: %s",
 			resource, strings.Join(validSubcmds, ", "))
+	case "config":
+		// Config operations for context and configuration management
+		validSubcmds := []string{
+			"current-context", "get-contexts", "use-context",
+		}
+		for _, subcmd := range validSubcmds {
+			if resource == subcmd {
+				return nil
+			}
+		}
+		return fmt.Errorf("invalid config subcommand '%s'. Valid subcommands: %s",
+			resource, strings.Join(validSubcmds, ", "))
 	default:
-		return fmt.Errorf("invalid operation '%s' for config tool. Valid operations: diff, auth, certificate",
+		return fmt.Errorf("invalid operation '%s' for config tool. Valid operations: diff, auth, certificate, config",
 			operation)
 	}
 }
