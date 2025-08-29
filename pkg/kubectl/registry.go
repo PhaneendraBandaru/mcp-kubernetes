@@ -365,16 +365,18 @@ func createConfigTool(readOnly bool) mcp.Tool {
 Available operations:
 - diff: Diff the live version against what would be applied
 - auth: Inspect authorization (can-i)
+- config: View kubectl configuration contexts (read-only)
+
+Config operations (read-only):
+- current-context: Display the current context
+- get-contexts: Describe one or many contexts
 
 Examples:
 - Diff config: operation='diff', resource='', args='-f pod.json'
-- Diff from stdin: operation='diff', resource='', args='-f -'
-- Diff with selector: operation='diff', resource='', args='-f manifest.yaml -l app=nginx'
 - Check auth: operation='auth', resource='can-i', args='create pods --all-namespaces'
-- Check auth resource: operation='auth', resource='can-i', args='list deployments.apps'
-- Check auth as user: operation='auth', resource='can-i', args='list pods --as=system:serviceaccount:dev:foo -n prod'
-- List permissions: operation='auth', resource='can-i', args='--list --namespace=foo'`
-		operationDesc = "The operation to perform: diff, auth"
+- Get current context: operation='config', resource='current-context', args=''
+- List contexts: operation='config', resource='get-contexts', args=''`
+		operationDesc = "The operation to perform: diff, auth, config"
 	} else {
 		description = `Work with Kubernetes configurations.
 
@@ -382,17 +384,21 @@ Available operations:
 - diff: Diff the live version against what would be applied
 - auth: Inspect authorization (can-i)
 - certificate: Manage certificate resources (approve, deny)
+- config: View and manage kubectl configuration contexts
+
+Config operations:
+- current-context: Display the current context
+- get-contexts: Describe one or many contexts
+- use-context: Set the current context in kubeconfig
 
 Examples:
 - Diff config: operation='diff', resource='', args='-f pod.json'
-- Diff with selector: operation='diff', resource='', args='-f manifest.yaml -l app=nginx'
 - Check auth: operation='auth', resource='can-i', args='create pods --all-namespaces'
-- Check auth resource: operation='auth', resource='can-i', args='list deployments.apps'
-- Check auth as user: operation='auth', resource='can-i', args='list pods --as=system:serviceaccount:dev:foo -n prod'
-- List permissions: operation='auth', resource='can-i', args='--list --namespace=foo'
 - Approve cert: operation='certificate', resource='approve', args='csr-name'
-- Deny cert: operation='certificate', resource='deny', args='csr-name'`
-		operationDesc = "The operation to perform: diff, auth, certificate"
+- Get current context: operation='config', resource='current-context', args=''
+- List contexts: operation='config', resource='get-contexts', args=''
+- Switch context: operation='config', resource='use-context', args='my-cluster-context'`
+		operationDesc = "The operation to perform: diff, auth, certificate, config"
 	}
 
 	return mcp.NewTool("kubectl_config",
@@ -403,7 +409,7 @@ Examples:
 		),
 		mcp.WithString("resource",
 			mcp.Required(),
-			mcp.Description("Subcommand for auth/certificate operations, or empty string '' for diff operation"),
+			mcp.Description("Subcommand for auth/certificate/config operations, or empty string '' for diff operation"),
 		),
 		mcp.WithString("args",
 			mcp.Required(),
@@ -448,6 +454,9 @@ func MapOperationToCommand(toolName, operation, resource string) (string, error)
 		}
 		if operation == "certificate" {
 			return "certificate " + resource, nil
+		}
+		if operation == "config" {
+			return "config " + resource, nil
 		}
 		return operation, nil
 	default:

@@ -166,6 +166,12 @@ Show me all deployments in the production namespace
 Scale my web deployment to 5 replicas
 
 Check if I have permission to create pods
+
+What is my current kubectl context?
+
+List all available kubectl contexts
+
+Switch to the production context
 ```
 
 ## Available Tools
@@ -335,12 +341,12 @@ args: "--recursive"
 
 **Available in**: readonly, readwrite, admin
 
-Handles configuration validation and security operations. In readonly mode, only supports `diff` and `auth can-i`.
+Handles configuration validation, security operations, and kubectl context management. In readonly mode, supports `diff`, `auth can-i`, and read-only config operations.
 
 **Parameters:**
 
-- `operation`: The operation to perform (diff, auth, certificate)
-- `resource`: Subcommand for auth/certificate operations
+- `operation`: The operation to perform (diff, auth, certificate, config)
+- `resource`: Subcommand for auth/certificate/config operations
 - `args`: Operation-specific arguments
 
 **Examples:**
@@ -355,7 +361,27 @@ args: "create pods"
 operation: "certificate"
 resource: "approve"
 args: "csr-name"
+
+# Get current context
+operation: "config"
+resource: "current-context"
+args: ""
+
+# List all contexts
+operation: "config"
+resource: "get-contexts"
+args: ""
+
+# Switch context (readwrite/admin only)
+operation: "config"
+resource: "use-context"
+args: "my-cluster-context"
 ```
+
+**Config Operations:**
+- `current-context`: Display the current context (readonly, readwrite, admin)
+- `get-contexts`: List all available contexts (readonly, readwrite, admin)
+- `use-context`: Switch to a different context (readwrite, admin only)
 
 </details>
 

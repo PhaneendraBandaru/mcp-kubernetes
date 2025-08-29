@@ -157,10 +157,18 @@ func (v *Validator) validateAccessLevel(command, commandType string) error {
 
 	switch v.secConfig.AccessLevel {
 	case AccessLevelReadOnly:
+		// Special handling for config operations - check if it's a write operation
+		if operation == "config" && v.isConfigWriteOperation(command) {
+			return &ValidationError{Message: "Error: Cannot execute config write operations in read-only mode"}
+		}
 		if !v.isOperationInList(operation, readOperations) {
 			return &ValidationError{Message: "Error: Cannot execute write or admin operations in read-only mode"}
 		}
 	case AccessLevelReadWrite:
+		// Special handling for config operations - allow write config operations in readwrite mode
+		if operation == "config" {
+			return nil // All config operations are allowed in readwrite mode
+		}
 		if !v.isOperationInList(operation, readOperations) && !v.isOperationInList(operation, readWriteOperations) {
 			// Check if it's an admin operation to provide better error message
 			if v.isOperationInList(operation, adminOperations) {
@@ -169,7 +177,10 @@ func (v *Validator) validateAccessLevel(command, commandType string) error {
 			return &ValidationError{Message: "Error: Operation not allowed in read-write mode"}
 		}
 	case AccessLevelAdmin:
-		// Admin level allows all operations (read, write, and admin)
+		// Admin level allows all operations (read, write, and admin), including all config operations
+		if operation == "config" {
+			return nil // All config operations are allowed in admin mode
+		}
 		if !v.isOperationInList(operation, readOperations) &&
 			!v.isOperationInList(operation, readWriteOperations) &&
 			!v.isOperationInList(operation, adminOperations) {
@@ -230,6 +241,28 @@ func (v *Validator) extractOperationFromCommand(command, commandType string) str
 	}
 
 	return operation
+}
+
+// isConfigWriteOperation checks if a config command is a write operation
+func (v *Validator) isConfigWriteOperation(command string) bool {
+	// Extract config subcommand
+	cmdParts := strings.Fields(command)
+	if len(cmdParts) < 2 || cmdParts[0] != "config" {
+		return false
+	}
+
+	writeSubcommands := []string{
+		"use-context",
+	}
+
+	subcommand := cmdParts[1]
+	for _, writeOp := range writeSubcommands {
+		if subcommand == writeOp {
+			return true
+		}
+	}
+
+	return false
 }
 
 // extractNamespaceFromCommand extracts the namespace from a command

@@ -65,7 +65,7 @@ func TestConsolidatedToolDescriptions(t *testing.T) {
 		},
 		{
 			toolName:           "kubectl_config",
-			expectedOperations: []string{"diff", "auth", "certificate"},
+			expectedOperations: []string{"diff", "auth", "certificate", "config"},
 			expectedInDesc:     []string{"configurations", "Examples:"},
 		},
 	}
@@ -276,6 +276,28 @@ func TestMapOperationToCommand_AllTools(t *testing.T) {
 			operation: "certificate",
 			resource:  "approve",
 			want:      "certificate approve",
+		},
+		// kubectl_config config operations tests
+		{
+			name:      "config current-context",
+			toolName:  "kubectl_config",
+			operation: "config",
+			resource:  "current-context",
+			want:      "config current-context",
+		},
+		{
+			name:      "config get-contexts",
+			toolName:  "kubectl_config",
+			operation: "config",
+			resource:  "get-contexts",
+			want:      "config get-contexts",
+		},
+		{
+			name:      "config use-context",
+			toolName:  "kubectl_config",
+			operation: "config",
+			resource:  "use-context",
+			want:      "config use-context",
 		},
 		// Unknown tool test
 		{
